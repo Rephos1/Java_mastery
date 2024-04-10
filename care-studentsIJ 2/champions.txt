@@ -1,0 +1,12 @@
+Ganfrank,7,yes,400,transmutation, , ,wizard
+Rudolf,6,yes,400,invisibility, , ,wizard
+Elblond,1, ,150, ,sword, ,warrior
+Flimsi,2, ,200, ,bow, ,warrior
+Drabina,7, ,500, , ,no,dragon
+Golum,7, ,500, , ,yes,dragon
+Argon,9, ,900,mace, ,warrior
+Neon,2,no,300,translocation, , ,wizard
+Xenon,7, ,500, , ,yes,dragon
+Atlanta,5, ,500, ,bow, ,warrior
+Krypton,8,no,300,fireballs, , ,wizard
+Hedwig,1,yes,400,flying, , ,wizard

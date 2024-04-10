@@ -1,4 +1,8 @@
 package cwk4;
+import cwk4.challenge.Challenge;
+import cwk4.challenge.Type;
+import cwk4.champion.*;
+
 import java.util.*;
 import java.io.*;
 /**
@@ -13,6 +17,11 @@ public class Tournament implements CARE
 {
    
     private String vizier;
+    private boolean defeated = false;
+    private int money = 1000;
+    private HashMap<String, Champion> champions = new HashMap<>();
+    private HashMap<Integer, Challenge> challenges = new HashMap<>();
+
 
 
 //**************** CARE ************************** 
@@ -66,7 +75,7 @@ public class Tournament implements CARE
      */
     public boolean isDefeated()
     {
-        return false;
+        return this.defeated;
     }
     
     /** returns the amount of money in the Treasury
@@ -74,7 +83,7 @@ public class Tournament implements CARE
      */
     public int getMoney()
     {
-        return 0;
+        return this.money;
     }
     
     
@@ -83,9 +92,16 @@ public class Tournament implements CARE
      **/
     public String getReserve()
     {   
-        String s = "************ Champions available in reserves********";
-        
-        return s;
+        //String s = "************ Champions available in reserves********";
+        StringBuilder sb = new StringBuilder("************ Champions available in reserves********");
+
+        for(Champion ch : champions.values()) {
+            if(ch.getState() != ChampionState.WAITING)
+                continue;
+            sb.append("\n");
+            sb.append(ch);
+        }
+        return sb.toString();
     }
     
         
@@ -95,17 +111,18 @@ public class Tournament implements CARE
      **/
     public String getChampionDetails(String nme)
     {
-       
-        return "\nNo such champion";
+        //inline if, learn it is useful!
+        return champions.containsKey(nme) ? champions.get(nme).toString() : "No Champion with given name";
     }    
     
     /** returns whether champion is in reserve
     * @param nme champion's name
     * @return true if champion in reserve, false otherwise
     */
-    public boolean isInReserve(String nme)
-    {
-        return (false);
+    public boolean isInReserve(String nme) {
+        if(!champions.containsKey(nme))
+            return false;
+        return champions.get(nme).getState() == ChampionState.WAITING;
     }
  
     // ***************** Team champions ************************   
@@ -121,8 +138,16 @@ public class Tournament implements CARE
      **/        
     public int enterChampion(String nme)
     {
-        
-        return -1;
+        if(!champions.containsKey(nme))
+            return -1;
+        Champion ch = champions.get(nme);
+        if(ch.getState() != ChampionState.WAITING)
+            return 1;
+        if(ch.getEntryFee() > this.money)
+            return 2;
+        this.money -= ch.getEntryFee();
+        ch.setState(ChampionState.ENTERED);
+        return 0;
     }
         
      /** Returns true if the champion with the name is in 
@@ -131,9 +156,10 @@ public class Tournament implements CARE
      * @return returns true if the champion with the name
      * is in the vizier's team, false otherwise.
      **/
-    public boolean isInViziersTeam(String nme)
-    {
-        return false;
+    public boolean isInViziersTeam(String nme) {
+        if(!champions.containsKey(nme))
+            return false;
+        return champions.get(nme).getState().equals(ChampionState.ENTERED);
     }
     
     /** Removes a champion from the team back to the reserves (if they are in the team)
@@ -145,12 +171,18 @@ public class Tournament implements CARE
      * @param nme is the name of the champion
      * @return as shown above 
      **/
-    public int retireChampion(String nme)
-    {
-        return -1;
+    public int retireChampion(String nme) {
+        if(!champions.containsKey(nme))
+            return -1;
+        Champion ch = champions.get(nme);
+        if(ch.getState().equals(ChampionState.WAITING))
+            return 2;
+        if(ch.getState().equals(ChampionState.DISQUALIFIED))
+            return 1;
+        ch.setState(ChampionState.WAITING);
+        this.money += ch.getEntryFee() / 2;
+        return 0;
     }
-    
-    
         
     /**Returns a String representation of the champions in the vizier's team
      * or the message "No champions entered"
@@ -158,22 +190,50 @@ public class Tournament implements CARE
      **/
     public String getTeam()
     {
-        String s = "************ Vizier's Team of champions********";
-        
-       
-        return s;
+        StringBuilder s = new StringBuilder("************ Vizier's Team of champions********");
+
+//        ArrayList<Champion> chs = new ArrayList<>(champions.values());
+//        for(int i = 0; i < chs.size(); i++) {
+//            Champion ch = chs.get(i);
+//
+//        }
+
+
+        for(Champion ch : champions.values()) {
+            if(ch.getState().equals(ChampionState.ENTERED)){
+                s.append("\n");
+                s.append(ch);
+            }
+        }
+
+        if(s.length() == 47) {
+            s.append("\n");
+            s.append("No champions entered");
+        }
+        return s.toString();
     }
-    
-     /**Returns a String representation of the disquakified champions in the vizier's team
+
+     /**Returns a String representation of the disqualified champions in the vizier's team
      * or the message "No disqualified champions "
      * @return a String representation of the disqualified champions in the vizier's team
      **/
     public String getDisqualified()
     {
-        String s = "************ Vizier's Disqualified champions********";
-        
-        
-        return s;
+        StringBuilder s = new StringBuilder("************ Vizier's Team of disqualified champions ********");
+
+        for(Champion ch : champions.values()){
+            if(ch.getState().equals(ChampionState.DISQUALIFIED)){
+                s.append("\n");
+                s.append(ch);
+            }
+        }
+
+        if(s.length() == 61) {
+            s.append("\n");
+            s.append("No disqualified champions ");
+        }
+
+        return s.toString();
     }
     
 //**********************Challenges************************* 
@@ -181,9 +241,8 @@ public class Tournament implements CARE
      * @param num is the  number of the challenge
      * @return true if the  number represents a challenge
      **/
-     public boolean isChallenge(int num)
-     {
-         return (false);
+     public boolean isChallenge(int num) {
+         return challenges.containsKey(num);
      }    
    
     /** Provides a String representation of an challenge given by 
@@ -192,11 +251,10 @@ public class Tournament implements CARE
      * @return returns a String representation of a challenge given by 
      * the challenge number
      **/
-    public String getChallenge(int num)
-    {
-        
-        
-        return "\nNo such challenge";
+    public String getChallenge(int num) {
+        if(!isChallenge(num))
+            return "\nNo such challenge";
+        return challenges.get(num).toString();
     }
     
     /** Provides a String representation of all challenges 
@@ -204,9 +262,13 @@ public class Tournament implements CARE
      **/
     public String getAllChallenges()
     {
-        String s = "\n************ All Challenges ************\n";
-       
-        return s;
+        StringBuilder s = new StringBuilder("************ All Challenges ************");
+        for(Challenge ch : challenges.values()){
+            s.append("\n");
+            s.append(ch);
+        }
+
+        return s.toString();
     }
     
     
@@ -227,25 +289,46 @@ public class Tournament implements CARE
      */ 
     public int meetChallenge(int chalNo)
     {
-        //Nothing said about accepting challenges when bust
-        int outcome = -1 ;
-        
-        return outcome;
+        if(!champions.containsKey(chalNo)) {
+            return -1;
+        }
+        Challenge ch = challenges.get(chalNo);
+        //if(!champions.containsKey())
+
+        return 0;
     }
  
 
     //****************** private methods for Task 3 functionality*******************
     //*******************************************************************************
-    private void setupChampions()
-    {
-        
-
-   }
+    private void setupChampions() {
+        champions.put("Ganfrank", new Wizard("Ganfrank", 7, 400, true, SpellSpecialities.TRANSMUTATION));
+        champions.put("Rudolf", new Wizard("Rudolf", 6, 400, true, SpellSpecialities.INVISIBILITY));
+        champions.put("Elblond", new Warrior("Elblond", 1, 150, Weapons.SWORD));
+        champions.put("Flimsi", new Warrior("Flimsi", 2, 200, Weapons.BOW));
+        champions.put("Drabina", new Dragon("Drabina", 7, 500, false));
+        champions.put("Golum", new Dragon("Golum", 7, 500, true));
+        champions.put("Argon", new Warrior("Argon", 9, 900, Weapons.MACE));
+        champions.put("Neon", new Wizard("Neon", 2, 300, false, SpellSpecialities.TRANSLOCATION));
+        champions.put("Xenon", new Dragon("Xenon", 7, 500, true));
+        champions.put("Atlanta", new Warrior("Atlanta", 5, 500, Weapons.BOW));
+        champions.put("Krypton", new Wizard("Krypton", 8, 300, false, SpellSpecialities.FIREBALLS));
+        champions.put("Hedwig", new Wizard("Hedwig", 1, 400, true, SpellSpecialities.FLYING));
+    }
      
-    private void setupChallenges()
-    {
-
-
+    private void setupChallenges() {
+        challenges.put(1, new Challenge("Borg", Type.MAGIC, 1, 3, 100));
+        challenges.put(2, new Challenge("Huns", Type.FIGHT, 2, 3, 120));
+        challenges.put(3, new Challenge("Ferengi", Type.MYSTERY, 3, 3, 150));
+        challenges.put(4, new Challenge("Vandal", Type.MAGIC, 4, 9, 200));
+        challenges.put(5, new Challenge("Borg", Type.MYSTERY, 5, 7, 90));
+        challenges.put(6, new Challenge("Goth", Type.FIGHT, 6, 8, 45));
+        challenges.put(7, new Challenge("Frank", Type.MAGIC, 7, 10, 200));
+        challenges.put(8, new Challenge("Sith", Type.FIGHT, 8, 10, 170));
+        challenges.put(9, new Challenge("Cardashian", Type.MYSTERY, 9, 9, 300));
+        challenges.put(10, new Challenge("Jute", Type.FIGHT, 10, 2, 300));
+        challenges.put(11, new Challenge("Celt", Type.MAGIC, 11, 2, 250));
+        challenges.put(12, new Challenge("Celt", Type.MYSTERY, 12, 1, 250));
     }
         
     // Possible useful private methods
@@ -272,8 +355,28 @@ public class Tournament implements CARE
      * @param filename of the comma-separated textfile storing information about challenges
      */
     public void readChallenges(String filename)
-    { 
-        
+    {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(filename));
+            String line;
+            int i = 1;
+            while ((line = reader.readLine()) != null){
+                if(line.isEmpty()){
+                    continue;
+                }
+                //First line: Magic,Borg,3,100
+                String[] parts = line.split(",");
+                Type type = Type.valueOf(parts[0].toUpperCase());
+                String name = parts[1];
+                int skillRequired = Integer.parseInt(parts[2]);
+                int reward = Integer.parseInt(parts[3]);
+
+                challenges.put(i, new Challenge(name, type, i, skillRequired, reward));
+                i++;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }   
     
      /** reads all information about the game from the specified file 
