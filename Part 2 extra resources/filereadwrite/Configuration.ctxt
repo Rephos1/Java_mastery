@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.params=
+comment0.target=Configuration()
+comment1.params=
+comment1.target=void\ configure()
+comment1.text=\r\n\ Load\ the\ Student\ configuration\ information.\r\n\ @param\ fileName\ the\ file\ containing\ the\ data.\r\n
+comment2.params=
+comment2.target=void\ printList()
+comment3.params=args
+comment3.target=void\ main(java.lang.String[])
+numComments=4
