@@ -23,18 +23,18 @@ public class Teamwork
         details[2] = "Fahad";
         details[3] = "21051782";
 
-        details[4] = "surname of member2";
-        details[5] = "first name of member2";
-        details[6] = "SRN of member2";
+        details[4] = "Pinter";
+        details[5] = "Kitti";
+        details[6] = "21062343";
 
-        details[7] = "surname of member3";
-        details[8] = "first name of member3";
-        details[9] = "SRN of member3";
+        details[7] = "Lachezarov Barzakov";
+        details[8] = "Radostin";
+        details[9] = "22010580";
 
 
-        details[10] = "surname of member4";
-        details[11] = "first name of member4";
-        details[12] = "SRN of member4";
+        details[10] = "Dani";
+        details[11] = "Mihaly";
+        details[12] = "21055390";
 
     }
     

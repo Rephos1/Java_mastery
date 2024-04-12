@@ -58,12 +58,12 @@ public class Tournament implements CARE
      * whether defeated or not, and the champions currently in the 
      * team,(or, "No champions" if team is empty)
      **/
-    public String toString()
+    public String toString() // updated method, feel free to change - FC
     {
         String s = "\nVizier: " + vizier +
                 "\nTreasury: " + money +
                 "\nDefeated: " + defeated +
-                "\nChampion in Team: " + getTeam();
+                "\nChampion in Team: " + getTeam(); // if statment?? - FC
         return s;
     }
     
@@ -287,17 +287,16 @@ public class Tournament implements CARE
      * @param chalNo is the number of the challenge
      * @return an int showing the result(as above) of fighting the challenge
      */ 
-    public int meetChallenge(int chalNo)
-    {
-        if(!champions.containsKey(chalNo)) {
+    public int meetChallenge(int chalNo) {
+        if (!champions.containsKey(chalNo)) {
             return -1;
         }
         Challenge ch = challenges.get(chalNo);
         //if(!champions.containsKey())
 
         return 0;
+
     }
- 
 
     //****************** private methods for Task 3 functionality*******************
     //*******************************************************************************
@@ -334,15 +333,23 @@ public class Tournament implements CARE
     // Possible useful private methods
 //     private Challenge getAChallenge(int no)
 //     {
-//         
+//
 //         return null;
 //     }
-//    
-//     private Champion getChampionForChallenge(Challenge chal)
-//     {
-//         
-//         return null;
-//     }
+//
+     private Champion getChampionForChallenge(Challenge chal) // method updated - FC
+     {
+         for (Champion c : champions.values()) {
+             if (c.getState() == ChampionState.ENTERED &&
+                     c.getSkillLevel() >= chal.getSkillRequired()){
+                 return c;
+             }
+         }
+         return null;
+     }
+
+
+
 
     //*******************************************************************************
     //*******************************************************************************
