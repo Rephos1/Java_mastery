@@ -30,10 +30,8 @@ public class Tournament implements CARE
      */  
     public Tournament(String viz)
     {
-      
-        
-       setupChampions();
-       setupChallenges();
+        setupChampions();
+        setupChallenges();
     }
     
     /** Constructor requires the name of the vizier and the
@@ -62,8 +60,10 @@ public class Tournament implements CARE
      **/
     public String toString()
     {
-        String s = "\nVizier: " + vizier ;
-        
+        String s = "\nVizier: " + vizier +
+                "\nTreasury: " + money +
+                "\nDefeated: " + defeated +
+                "\nChampion in Team: " + getTeam();
         return s;
     }
     
