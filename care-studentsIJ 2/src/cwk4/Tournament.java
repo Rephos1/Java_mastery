@@ -3,8 +3,11 @@ import cwk4.challenge.Challenge;
 import cwk4.challenge.Type;
 import cwk4.champion.*;
 
+import java.sql.Array;
 import java.util.*;
 import java.io.*;
+import java.util.stream.Stream;
+
 /**
  * This interface specifies the behaviour expected from CARE
  * as required for 5COM2007 Cwk 4
@@ -30,6 +33,7 @@ public class Tournament implements CARE
      */  
     public Tournament(String viz)
     {
+        this.vizier = viz;
         setupChampions();
         setupChallenges();
     }
@@ -41,10 +45,10 @@ public class Tournament implements CARE
      */  
     public Tournament(String viz, String filename)  //Task 3.5
     {
-      
+        this.vizier = viz;
         
-       setupChampions();
-       readChallenges(filename);
+        setupChampions();
+        readChallenges(filename);
     }
     
     
@@ -103,7 +107,11 @@ public class Tournament implements CARE
         }
         return sb.toString();
     }
-    
+
+    //TODO delete
+    public List<Champion> getAllChampions() {
+        return new ArrayList<>(champions.values());
+    }
         
     /** Returns details of the champion with the given name. 
      * Champion names are unique.
@@ -199,11 +207,9 @@ public class Tournament implements CARE
 //        }
 
 
-        for(Champion ch : champions.values()) {
-            if(ch.getState().equals(ChampionState.ENTERED)){
-                s.append("\n");
-                s.append(ch);
-            }
+        for(Champion ch : getTeamList()) {
+            s.append("\n");
+            s.append(ch);
         }
 
         if(s.length() == 47) {
@@ -211,6 +217,15 @@ public class Tournament implements CARE
             s.append("No champions entered");
         }
         return s.toString();
+    }
+
+    private List<Champion> getTeamList() {
+        List<Champion> val = new ArrayList<>();
+        for(Champion ch : champions.values()) {
+            if(ch.getState() == ChampionState.ENTERED)
+                val.add(ch);
+        }
+        return val;
     }
 
      /**Returns a String representation of the disqualified champions in the vizier's team
@@ -280,7 +295,7 @@ public class Tournament implements CARE
      * 1 - challenge lost on skills  - deduct reward from
      * treasury and record champion as "disqualified"
      * 2 - challenge lost as no suitable champion is  available, deduct
-     * the reward from treasury 
+     * the reward from treasury
      * 3 - If a challenge is lost and vizier completely defeated (no money and 
      * no champions to withdraw) 
      * -1 - no such challenge 
@@ -288,14 +303,57 @@ public class Tournament implements CARE
      * @return an int showing the result(as above) of fighting the challenge
      */ 
     public int meetChallenge(int chalNo) {
-        if (!champions.containsKey(chalNo)) {
+        if (!challenges.containsKey(chalNo)) {
             return -1;
         }
-        Challenge ch = challenges.get(chalNo);
-        //if(!champions.containsKey())
+        //int minChampFee = champions.values().stream()
+        //        .filter((c) -> c.getState()==ChampionState.WAITING)
+        //        .map(Champion::getEntryFee).sorted().findFirst().get();
 
+
+//        int minChampFee = Integer.MAX_VALUE;
+//        for(Champion ch : champions.values()) {
+//            if(ch.getState() != ChampionState.WAITING)
+//                continue;
+//            if(minChampFee > ch.getEntryFee()){
+//                minChampFee = ch.getEntryFee();
+//            }
+//        }
+        Challenge ch = challenges.get(chalNo);
+        Optional<Champion> champOpt = champions.values().stream()
+                .filter((c) -> c.getState() == ChampionState.ENTERED)
+                .filter((c) -> c.canChallenge(ch.getType())).findFirst();
+        if(champOpt.isEmpty()) {
+            this.money -= ch.getReward();
+            if(this.money < 0 && getTeamList().isEmpty()) {
+                this.defeated = true;
+                return 3;
+            }
+            return 2;
+        }
+        Champion champ = champOpt.get();
+        if(champ.getSkillLevel() < ch.getSkillRequired()) {
+            champ.setState(ChampionState.DISQUALIFIED);
+            this.money -= ch.getReward();
+            if(this.money < 0 && getTeamList().isEmpty()){
+                this.defeated = true;
+                return 3;
+            }
+            return 1;
+        }
+        this.money += ch.getReward();
         return 0;
 
+    }
+
+    private Champion getChampionForChallenge(Challenge chal) {
+        for (Champion c : champions.values()) {
+            if (c.getState() == ChampionState.ENTERED &&
+                    c.getSkillLevel() >= chal.getSkillRequired()) {
+                return c;
+            }
+        }
+        return null;
     }
 
     //****************** private methods for Task 3 functionality*******************
@@ -337,16 +395,7 @@ public class Tournament implements CARE
 //         return null;
 //     }
 //
-     private Champion getChampionForChallenge(Challenge chal) // method updated - FC
-     {
-         for (Champion c : champions.values()) {
-             if (c.getState() == ChampionState.ENTERED &&
-                     c.getSkillLevel() >= chal.getSkillRequired()){
-                 return c;
-             }
-         }
-         return null;
-     }
+
 
 
 
@@ -392,10 +441,21 @@ public class Tournament implements CARE
      * @return the game (as a Tournament object)
      */
     public Tournament loadGame(String fname)
-    {   // uses object serialisation 
-       Tournament yyy = null;
-       
-       return yyy;
+    {   // uses object serialisation
+
+        try {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(new File(fname)));
+            this.vizier = in.readUTF();
+            this.defeated = in.readBoolean();
+            this.money = in.readInt();
+            this.champions = (HashMap<String, Champion>) in.readObject();
+            this.challenges = (HashMap<Integer, Challenge>) in.readObject();
+            in.close();
+            return this;
+        } catch (Exception ex) {
+            new RuntimeException("Failed to load game state!", ex).printStackTrace();
+        }
+        return null;
    } 
    
    /** Writes whole game to the specified file
@@ -403,9 +463,37 @@ public class Tournament implements CARE
      */
    public void saveGame(String fname){
         // uses object serialisation 
-        
+        File file = new File(fname);
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+            out.writeUTF(this.vizier);
+            out.writeBoolean(this.defeated);
+            out.writeInt(this.money);
+            out.writeObject(champions);
+            out.writeObject(challenges);
+            out.flush();
+            out.close();
+        } catch (Exception ex) {
+            new RuntimeException("Failed to save game state!", ex).printStackTrace();
+        }
     }
- 
+
+//    public static void main(String[] args) {
+//       Tournament t = new Tournament("cica");
+//
+//       t.money = 999;
+//       t.champions.get("Neon").setState(ChampionState.ENTERED);
+//
+//       t.saveGame("asd.txt");
+//
+//       t.champions.get("Neon").setState(ChampionState.DISQUALIFIED);
+//       t.money = 500;
+//
+//       //t.loadGame("asd.txt");
+//       t = new Tournament("");//.loadGame("asd.txt");
+//       System.out.println("MOnnney: " + t.money);
+//       System.out.println("Champ: " + t.champions.get("Neon"));
+//    }
 
 }
 

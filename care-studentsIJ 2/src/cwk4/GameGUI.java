@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class GameGUI 
 {
-    private CARE gp = new Tournament("Fred");
+    private CARE tournament = new Tournament("Fred");
     private JFrame myFrame = new JFrame("Game GUI");
     private JTextArea listing = new JTextArea();
     private JLabel codeLabel = new JLabel ();
@@ -21,6 +21,8 @@ public class GameGUI
     private JButton clearBtn = new JButton("Clear");
     private JButton quitBtn = new JButton("Quit");
     private JPanel eastPanel = new JPanel();
+    private JOptionPane selectChampion = new JOptionPane();
+    private Component currentComponent = null;
 
     public static void main(String[] args)
     {
@@ -29,8 +31,10 @@ public class GameGUI
     
     public GameGUI()
     {
-        makeFrame();
-        makeMenuBar(myFrame);
+        EventQueue.invokeLater(() -> {
+            makeFrame();
+            makeMenuBar(myFrame);
+        });
     }
     
 
@@ -40,23 +44,30 @@ public class GameGUI
     private void makeFrame()
     {    
         myFrame.setLayout(new BorderLayout());
-        myFrame.add(listing,BorderLayout.CENTER);
-        listing.setVisible(false);
         myFrame.add(eastPanel, BorderLayout.EAST);
         // set panel layout and add components
         eastPanel.setLayout(new GridLayout(4,1));
         eastPanel.add(meetBtn);
+        eastPanel.add(viewBtn);
         eastPanel.add(clearBtn);
         eastPanel.add(quitBtn);
         
         clearBtn.addActionListener(new ClearBtnHandler());
         meetBtn.addActionListener(new MeetBtnHandler());
+        viewBtn.addActionListener((ActionEvent event) -> {
+            String gameState = tournament.toString();
+            listing.setText(gameState);
+            setContent(listing);
+        });
         quitBtn.addActionListener(new QuitBtnHandler());
+
         
         meetBtn.setVisible(true);
         clearBtn.setVisible(true);
         quitBtn.setVisible(true);
-        // building is done - arrange the components and show        
+        myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // building is done - arrange the components and show
+        myFrame.setPreferredSize(new Dimension(600, 400));
         myFrame.pack();
         myFrame.setVisible(true);
     }
@@ -66,26 +77,42 @@ public class GameGUI
      */
     private void makeMenuBar(JFrame frame)
     {
-        JMenuBar menubar = new JMenuBar();
-        frame.setJMenuBar(menubar);
-        
-        // create the File menu
-        JMenu championMenu = new JMenu("Champions");
-        menubar.add(championMenu);
-        
+
         JMenuItem listChampionItem = new JMenuItem("List Champions in reserve");
         listChampionItem.addActionListener(new ListReserveHandler());
-        championMenu.add(listChampionItem);
+        JMenuItem listChampionInTeamItem = new JMenuItem("List Champions in team");
+        listChampionItem.addActionListener((ActionEvent event) -> {
+            setContent(listing);
+            String teamMembers = tournament.getTeam();
+            listing.setText(teamMembers);
+        });
+        JMenuItem listChallengesItem = new JMenuItem("List Challenges");
+        listChallengesItem.addActionListener((ActionEvent event) -> {
+            setContent(listing);
+            String challenges = tournament.getAllChallenges();
+            listing.setText(challenges);
+        });
+        JMenuBar menubar = new JMenuBar();
+        frame.setJMenuBar(menubar);
 
- 
+        // create the File menu
+        JMenu championMenu = new JMenu("Champions");
+        championMenu.add(listChampionItem);
+        championMenu.add(listChampionInTeamItem);
+
+        JMenu challengeMenu = new JMenu("Challenge");
+        challengeMenu.add(listChallengesItem);
+
+        menubar.add(championMenu);
+        menubar.add(challengeMenu);
     }
     
     private class ListReserveHandler implements ActionListener
     {
         public void actionPerformed(ActionEvent e) 
-        { 
-            listing.setVisible(true);
-            String xx = gp.getReserve();
+        {
+            setContent(listing);
+            String xx = tournament.getReserve();
             listing.setText(xx);
         }
     }
@@ -107,7 +134,7 @@ public class GameGUI
             String answer = "no such challenge";
             String inputValue = JOptionPane.showInputDialog("Challenge number ?: ");
             int num = Integer.parseInt(inputValue);
-            result = gp.meetChallenge(num);
+            result = tournament.meetChallenge(num);
             switch (result)
             {
                 case 0:answer = "challenge won by champion"; break;
@@ -133,6 +160,16 @@ public class GameGUI
                 System.exit(0); //closes the application
             }              
         }
+    }
+
+    private void setContent(Component comp) {
+        if(currentComponent != null) {
+            currentComponent.setVisible(false);
+            myFrame.remove(currentComponent);
+        }
+        currentComponent = comp;
+        currentComponent.setVisible(true);
+        myFrame.add(comp, BorderLayout.CENTER);
     }
     
 }

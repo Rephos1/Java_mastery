@@ -1,5 +1,7 @@
 package cwk4.champion;
 
-public enum SpellSpecialities {
+import java.io.Serializable;
+
+public enum SpellSpecialities implements Serializable {
     TRANSMUTATION, INVISIBILITY, TRANSLOCATION, FIREBALLS, FLYING
 }

@@ -1,6 +1,10 @@
 package cwk4.champion;
 
-public class Wizard extends Champion {
+import cwk4.challenge.Type;
+
+import java.io.Serializable;
+
+public class Wizard extends Champion implements Serializable {
     private boolean necromancer;
     private SpellSpecialities spellSpeciality;
 
@@ -16,5 +20,10 @@ public class Wizard extends Champion {
 
     public SpellSpecialities getSpellSpeciality() {
         return this.spellSpeciality;
+    }
+
+    @Override
+    public boolean canChallenge(Type chType) {
+        return true;
     }
 }

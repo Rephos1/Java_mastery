@@ -1,5 +1,7 @@
 package cwk4.challenge;
 
-public enum Type {
+import java.io.Serializable;
+
+public enum Type implements Serializable {
     MAGIC, FIGHT, MYSTERY
 }

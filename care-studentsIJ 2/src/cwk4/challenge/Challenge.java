@@ -1,6 +1,8 @@
 package cwk4.challenge;
 
-public class Challenge {
+import java.io.Serializable;
+
+public class Challenge implements Serializable {
     private int challengeNo;
     private Type type;
     private String enemyName;
@@ -34,5 +36,10 @@ public class Challenge {
 
     public int getReward() {
         return reward;
+    }
+
+    @Override
+    public String toString(){
+        return getChallengeNo() + " " + getType() + " " + getEnemyName();
     }
 }

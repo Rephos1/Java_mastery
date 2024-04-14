@@ -1,8 +1,11 @@
 package cwk4.champion;
 
 import cwk4.ChampionState;
+import cwk4.challenge.Type;
 
-public class Champion {
+import java.io.Serializable;
+
+public class Champion implements Serializable {
     protected String name;
     protected int skillLevel;
     protected int entryFee;
@@ -20,10 +23,23 @@ public class Champion {
     }
 
     public int getSkillLevel() {
+        if(this instanceof Dragon) {
+            return 7;
+        } else if(this instanceof Warrior) {
+            return getEntryFee()/100;
+        }
         return this.skillLevel;
     }
 
     public int getEntryFee() {
+        if(this instanceof Wizard wizard) {
+            if(wizard.isNecromancer()) {
+                return 400;
+            }
+            return 300;
+        } else if(this instanceof Dragon dragon) {
+            return 500;
+        }
         return this.entryFee;
     }
 
@@ -33,6 +49,11 @@ public class Champion {
 
     public void setState(ChampionState state) {
         this.state = state;
+    }
+
+    public boolean canChallenge(Type chType) {
+        // the base champion cannot fight
+        return false;
     }
 
     @Override
