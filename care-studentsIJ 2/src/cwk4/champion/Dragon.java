@@ -1,6 +1,6 @@
 package cwk4.champion;
 
-import cwk4.challenge.Type;
+import cwk4.ChallengeType;
 
 import java.io.Serializable;
 
@@ -16,7 +16,13 @@ public class Dragon extends Champion implements Serializable {
     }
 
     @Override
-    public boolean canChallenge(Type chType) {
-        return chType == Type.FIGHT || (chType == Type.MYSTERY && talks);
+    public boolean canChallenge(ChallengeType chType) {
+        return chType == ChallengeType.FIGHT || (chType == ChallengeType.MYSTERY && talks);
+    }
+
+    @Override
+    public String toString() {
+        String parentString = super.toString();
+        return "\nCharacter: Dragon -> " + parentString + "\nIt can talk: " + this.talks;
     }
 }

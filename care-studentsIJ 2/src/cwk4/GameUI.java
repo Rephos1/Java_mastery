@@ -45,24 +45,63 @@ public class GameUI
                     System.out.println(tr.getChampionDetails(ref));
                 } 
                 else if (choice == 4)
-                {   
-                    // provide code here
-                    // output should be meaningful
+                {
+                    System.out.println("Enter the Champion name");
+                    String name = (myIn.nextLine()).trim();
+                    result = tr.enterChampion(name);
+                    if (result == 0) {
+                        output = "Your Champion: " + name + " is entered in the team";
+                    } else if (result == 1) {
+                        output = "The Champion: " + name + " not in reserve";
+                    } else if (result == 2) {
+                        output = "You are poor! You don't have enough money to buy this champion.";
+                    } else {
+                        output = "No such champion found";
+                    }
+                    System.out.println("\n" + output);
+                    System.out.println("Your new Treasury Balance is: " + tr.getMoney());
 
                 }
                 else if (choice == 5)
                 {
                     // provide code here
                     // output should be meaningful
+                    System.out.println("Type the number of a challenge you wish to enter: ");
+                    String challengeNumber = (myIn.nextLine()).trim();
+                    int number = Integer.parseInt(challengeNumber);
+
+                    if (tr.isChallenge(number)) {
+                        result = tr.meetChallenge(number);
+                    }
+
+                    output = processChallengeResult(result);
+                    System.out.println("\n" + output);
+                    System.out.println("Your new Treasury Balance is: " + tr.getMoney());
+
                 }
                 else if (choice==6)
                 {
                     // provide code here
                     // output should be meaningful
+                    System.out.println("Enter Champion name");
+                    String championName = (myIn.nextLine()).trim();
+                    result = tr.retireChampion(championName);
+                    if (result == 0) {
+                        output = "\nChampion " + championName + " is retired";
+                    } else if (result == 1) {
+                        output = "\nChampion " + championName + " has already dead. Cannot retire him.";
+                    } else if (result == 2) {
+                        output = "\nChampion " + championName + " cannot be retired as he is not in the team";
+                    } else {
+                        output = "\nNo such champion found ";
+                    }
+                    System.out.println("\n" + output);
+                    System.out.println("Your new Treasury Balance is: " + tr.getMoney());
                 }  
                 else if (choice==7)
                 {
                     // provide code here
+                    System.out.println(tr);
                 }
                 else if (choice==8)
                 {

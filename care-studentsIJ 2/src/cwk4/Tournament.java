@@ -1,6 +1,5 @@
 package cwk4;
 import cwk4.challenge.Challenge;
-import cwk4.challenge.Type;
 import cwk4.champion.*;
 
 import java.sql.Array;
@@ -66,8 +65,8 @@ public class Tournament implements CARE
     {
         String s = "\nVizier: " + vizier +
                 "\nTreasury: " + money +
-                "\nDefeated: " + defeated +
-                "\nChampion in Team: " + getTeam(); // if statment?? - FC
+                "\n" + (defeated? "Defeated":"Is OK") +
+                "\nChampion in Team: \n" + getTeam(); // if statment?? - FC
         return s;
     }
     
@@ -374,18 +373,18 @@ public class Tournament implements CARE
     }
      
     private void setupChallenges() {
-        challenges.put(1, new Challenge("Borg", Type.MAGIC, 1, 3, 100));
-        challenges.put(2, new Challenge("Huns", Type.FIGHT, 2, 3, 120));
-        challenges.put(3, new Challenge("Ferengi", Type.MYSTERY, 3, 3, 150));
-        challenges.put(4, new Challenge("Vandal", Type.MAGIC, 4, 9, 200));
-        challenges.put(5, new Challenge("Borg", Type.MYSTERY, 5, 7, 90));
-        challenges.put(6, new Challenge("Goth", Type.FIGHT, 6, 8, 45));
-        challenges.put(7, new Challenge("Frank", Type.MAGIC, 7, 10, 200));
-        challenges.put(8, new Challenge("Sith", Type.FIGHT, 8, 10, 170));
-        challenges.put(9, new Challenge("Cardashian", Type.MYSTERY, 9, 9, 300));
-        challenges.put(10, new Challenge("Jute", Type.FIGHT, 10, 2, 300));
-        challenges.put(11, new Challenge("Celt", Type.MAGIC, 11, 2, 250));
-        challenges.put(12, new Challenge("Celt", Type.MYSTERY, 12, 1, 250));
+        challenges.put(1, new Challenge("Borg", ChallengeType.MAGIC, 1, 3, 100));
+        challenges.put(2, new Challenge("Huns", ChallengeType.FIGHT, 2, 3, 120));
+        challenges.put(3, new Challenge("Ferengi", ChallengeType.MYSTERY, 3, 3, 150));
+        challenges.put(4, new Challenge("Vandal", ChallengeType.MAGIC, 4, 9, 200));
+        challenges.put(5, new Challenge("Borg", ChallengeType.MYSTERY, 5, 7, 90));
+        challenges.put(6, new Challenge("Goth", ChallengeType.FIGHT, 6, 8, 45));
+        challenges.put(7, new Challenge("Frank", ChallengeType.MAGIC, 7, 10, 200));
+        challenges.put(8, new Challenge("Sith", ChallengeType.FIGHT, 8, 10, 170));
+        challenges.put(9, new Challenge("Cardashian", ChallengeType.MYSTERY, 9, 9, 300));
+        challenges.put(10, new Challenge("Jute", ChallengeType.FIGHT, 10, 2, 300));
+        challenges.put(11, new Challenge("Celt", ChallengeType.MAGIC, 11, 2, 250));
+        challenges.put(12, new Challenge("Celt", ChallengeType.MYSTERY, 12, 1, 250));
     }
         
     // Possible useful private methods
@@ -422,7 +421,7 @@ public class Tournament implements CARE
                 }
                 //First line: Magic,Borg,3,100
                 String[] parts = line.split(",");
-                Type type = Type.valueOf(parts[0].toUpperCase());
+                ChallengeType type = ChallengeType.valueOf(parts[0].toUpperCase());
                 String name = parts[1];
                 int skillRequired = Integer.parseInt(parts[2]);
                 int reward = Integer.parseInt(parts[3]);
@@ -431,7 +430,8 @@ public class Tournament implements CARE
                 i++;
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("No challenges file: "+filename, e);
+
         }
     }   
     

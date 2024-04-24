@@ -1,7 +1,7 @@
 package cwk4.champion;
 
+import cwk4.ChallengeType;
 import cwk4.ChampionState;
-import cwk4.challenge.Type;
 
 import java.io.Serializable;
 
@@ -51,13 +51,13 @@ public class Champion implements Serializable {
         this.state = state;
     }
 
-    public boolean canChallenge(Type chType) {
+    public boolean canChallenge(ChallengeType chType) {
         // the base champion cannot fight
         return false;
     }
 
     @Override
     public String toString() {
-        return name + " (skill: " + skillLevel + ", entryFee: " + entryFee + ", state: " + state + ")";
+        return name + " (Skill: " + skillLevel + ", EntryFee: " + entryFee + ", State: " + state + ")";
     }
 }

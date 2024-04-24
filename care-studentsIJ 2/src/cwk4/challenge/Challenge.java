@@ -1,16 +1,18 @@
 package cwk4.challenge;
 
+import cwk4.ChallengeType;
+
 import java.io.Serializable;
 
 public class Challenge implements Serializable {
     private int challengeNo;
-    private Type type;
+    private ChallengeType type;
     private String enemyName;
     private int skillRequired;
     private int reward;
 
 
-    public Challenge(String enemyName, Type type, int challengeNo, int skillRequired, int reward) {
+    public Challenge(String enemyName, ChallengeType type, int challengeNo, int skillRequired, int reward) {
         this.enemyName = enemyName;
         this.type = type;
         this.challengeNo = challengeNo;
@@ -22,7 +24,7 @@ public class Challenge implements Serializable {
         return challengeNo;
     }
 
-    public Type getType() {
+    public ChallengeType getType() {
         return type;
     }
 
@@ -40,6 +42,6 @@ public class Challenge implements Serializable {
 
     @Override
     public String toString(){
-        return getChallengeNo() + " " + getType() + " " + getEnemyName();
+        return getChallengeNo() + " " + getType() + " " + getEnemyName() + " " + getSkillRequired() + " " + getReward();
     }
 }

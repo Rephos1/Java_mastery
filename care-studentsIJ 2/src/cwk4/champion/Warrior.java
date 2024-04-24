@@ -1,6 +1,6 @@
 package cwk4.champion;
 
-import cwk4.challenge.Type;
+import cwk4.ChallengeType;
 
 import java.io.Serializable;
 
@@ -17,7 +17,12 @@ public class Warrior extends Champion implements Serializable {
     }
 
     @Override
-    public boolean canChallenge(Type chType) {
-        return chType == Type.FIGHT;
+    public boolean canChallenge(ChallengeType chType) {
+        return chType == ChallengeType.FIGHT;
+    }
+    @Override
+    public String toString() {
+        String parentString = super.toString();
+        return "\nCharacter: Warrior -> " + parentString + "\nWeapon is: " + this.weapon;
     }
 }

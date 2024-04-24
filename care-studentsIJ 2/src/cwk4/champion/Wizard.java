@@ -1,6 +1,6 @@
 package cwk4.champion;
 
-import cwk4.challenge.Type;
+import cwk4.ChallengeType;
 
 import java.io.Serializable;
 
@@ -23,7 +23,12 @@ public class Wizard extends Champion implements Serializable {
     }
 
     @Override
-    public boolean canChallenge(Type chType) {
+    public boolean canChallenge(ChallengeType chType) {
         return true;
+    }
+    @Override
+    public String toString() {
+        String parentString = super.toString();
+        return "\nCharacter: Wizard -> " + parentString + "\nSpell Speciality : " + this.spellSpeciality + "\nIs Necromancer: " + this.necromancer ;
     }
 }

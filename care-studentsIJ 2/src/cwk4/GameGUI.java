@@ -6,11 +6,11 @@ import java.util.*;
 
 /**
  * Provide a GUI interface for the game
- * 
+ *
  * @author A.A.Marczyk
  * @version 20/01/24
  */
-public class GameGUI 
+public class GameGUI
 {
     private CARE tournament = new Tournament("Fred");
     private JFrame myFrame = new JFrame("Game GUI");
@@ -28,7 +28,7 @@ public class GameGUI
     {
         new GameGUI();
     }
-    
+
     public GameGUI()
     {
         EventQueue.invokeLater(() -> {
@@ -36,13 +36,13 @@ public class GameGUI
             makeMenuBar(myFrame);
         });
     }
-    
+
 
     /**
      * Create the Swing frame and its content.
      */
     private void makeFrame()
-    {    
+    {
         myFrame.setLayout(new BorderLayout());
         myFrame.add(eastPanel, BorderLayout.EAST);
         // set panel layout and add components
@@ -51,7 +51,7 @@ public class GameGUI
         eastPanel.add(viewBtn);
         eastPanel.add(clearBtn);
         eastPanel.add(quitBtn);
-        
+
         clearBtn.addActionListener(new ClearBtnHandler());
         meetBtn.addActionListener(new MeetBtnHandler());
         viewBtn.addActionListener((ActionEvent event) -> {
@@ -61,7 +61,7 @@ public class GameGUI
         });
         quitBtn.addActionListener(new QuitBtnHandler());
 
-        
+
         meetBtn.setVisible(true);
         clearBtn.setVisible(true);
         quitBtn.setVisible(true);
@@ -71,7 +71,7 @@ public class GameGUI
         myFrame.pack();
         myFrame.setVisible(true);
     }
-    
+
     /**
      * Create the main frame's menu bar.
      */
@@ -80,18 +80,49 @@ public class GameGUI
 
         JMenuItem listChampionItem = new JMenuItem("List Champions in reserve");
         listChampionItem.addActionListener(new ListReserveHandler());
+
+        JMenuItem enterChampionToTheTeam = new JMenuItem("Enter Champion to the team");
+        enterChampionToTheTeam.addActionListener((ActionEvent event) -> {
+            String champName = JOptionPane.showInputDialog("Champion name: ");
+            int returnValue = GameGUI.this.tournament.enterChampion(champName);
+            String message = "";
+            int money = GameGUI.this.tournament.getMoney();
+            if(returnValue == 0) {
+                message = champName + " Successfully joined to team \nYour remaining balance is: " + money;
+            } else if (returnValue == 1 ){
+                message = champName + " Champion is not in reserve";
+            } else if (returnValue == 2 ) {
+                message = "You are poor! Treasury out of money :( \nYour balance is: " + money;
+            } else {
+                message = "Wrong Champion name";
+            }
+            JOptionPane.showMessageDialog(GameGUI.this.myFrame, message);
+        });
+
+
         JMenuItem listChampionInTeamItem = new JMenuItem("List Champions in team");
-        listChampionItem.addActionListener((ActionEvent event) -> {
+        listChampionInTeamItem.addActionListener((ActionEvent event) -> {
             setContent(listing);
-            String teamMembers = tournament.getTeam();
+            String teamMembers = GameGUI.this.tournament.getTeam();
+            System.out.println(teamMembers);
             listing.setText(teamMembers);
         });
+
         JMenuItem listChallengesItem = new JMenuItem("List Challenges");
         listChallengesItem.addActionListener((ActionEvent event) -> {
             setContent(listing);
             String challenges = tournament.getAllChallenges();
             listing.setText(challenges);
         });
+
+        JMenuItem viewChampion = new JMenuItem("View a Champion details");
+        viewChampion.addActionListener((ActionEvent event) -> {
+            String champName = JOptionPane.showInputDialog("Champion name: ");
+            String result = GameGUI.this.tournament.getChampionDetails(champName);
+            JOptionPane.showMessageDialog(GameGUI.this.myFrame, result);
+        });
+
+
         JMenuBar menubar = new JMenuBar();
         frame.setJMenuBar(menubar);
 
@@ -99,6 +130,8 @@ public class GameGUI
         JMenu championMenu = new JMenu("Champions");
         championMenu.add(listChampionItem);
         championMenu.add(listChampionInTeamItem);
+        championMenu.add(enterChampionToTheTeam);
+        championMenu.add(viewChampion);
 
         JMenu challengeMenu = new JMenu("Challenge");
         challengeMenu.add(listChallengesItem);
@@ -106,30 +139,30 @@ public class GameGUI
         menubar.add(championMenu);
         menubar.add(challengeMenu);
     }
-    
+
     private class ListReserveHandler implements ActionListener
     {
-        public void actionPerformed(ActionEvent e) 
+        public void actionPerformed(ActionEvent e)
         {
             setContent(listing);
             String xx = tournament.getReserve();
             listing.setText(xx);
         }
     }
-    
-   
+
+
     private class ClearBtnHandler implements ActionListener
     {
-        public void actionPerformed(ActionEvent e) 
-        { 
+        public void actionPerformed(ActionEvent e)
+        {
             listing.setText(" ");
         }
     }
-    
+
     private class MeetBtnHandler implements ActionListener
     {
-        public void actionPerformed(ActionEvent e) 
-        { 
+        public void actionPerformed(ActionEvent e)
+        {
             int result = -1;
             String answer = "no such challenge";
             String inputValue = JOptionPane.showInputDialog("Challenge number ?: ");
@@ -142,15 +175,15 @@ public class GameGUI
                 case 2:answer = "challenge lost as no suitable champion is available";break;
                 case 3:answer = "challenge lost and vizier completely defeated";break;
             }
-            
-            JOptionPane.showMessageDialog(myFrame,answer);    
+
+            JOptionPane.showMessageDialog(myFrame,answer);
         }
     }
-    
+
     private class QuitBtnHandler implements ActionListener
     {
-        public void actionPerformed(ActionEvent e) 
-        { 
+        public void actionPerformed(ActionEvent e)
+        {
             int answer = JOptionPane.showConfirmDialog(myFrame,
                 "Are you sure you want to quit?","Finish",
                 JOptionPane.YES_NO_OPTION);
@@ -158,7 +191,7 @@ public class GameGUI
             if (answer == JOptionPane.YES_OPTION)
             {
                 System.exit(0); //closes the application
-            }              
+            }
         }
     }
 
@@ -171,6 +204,6 @@ public class GameGUI
         currentComponent.setVisible(true);
         myFrame.add(comp, BorderLayout.CENTER);
     }
-    
+
 }
-   
+
